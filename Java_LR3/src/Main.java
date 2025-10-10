@@ -1,34 +1,16 @@
 import Classes.*;
 import Interfaces.*;
-
+import Exception.*;
 import java.util.ArrayList;
 import java.util.*;
 
 public class Main{
+    static List<Content> contentDatabase = new ArrayList<>();
+
     public static void main(String[] args) {
-//    BooksSeries booksSeries = new BooksSeries("Чужестранка", new int[] {600,800,200},5);
-//    booksSeries.setElement(1,1200);
-//    System.out.println("Название серии книг: " + booksSeries.getTitle() + ";\nколичество страниц в книгах: " + Arrays.toString(booksSeries.getArray()) + ";\nрейтинг: " + booksSeries.getRating());
-//
-////    System.out.println(booksSeries.getIndex(1));
-//    System.out.println("");
-//
-//    Serial serial = new Serial("Красная королева", new int[]{10,12,110}, 4);
-//    serial.setElement(1,130);
-//    System.out.println("Название сериала: " + serial.getTitle() + ";\nколичество серий в сезоне: " + Arrays.toString(serial.getArray()) + ";\nрейтинг: " + serial.getRating());
-////    System.out.println(serial.getForIndex(1));
-//    System.out.println(serial.toString());
-//    System.out.println(booksSeries.toString());
-
-
         System.out.println("Лабораторная работа №3. Выполнила студентка группы 6301-020302D\nМирошник Мария");
-
-        List<Content> contentDatabase = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
 
-
-//    int index = 0;
-//    double value;
         int l = 0;
         String title = "";
         int rating = 0;
@@ -42,7 +24,7 @@ public class Main{
             System.out.println("2 - создать элемент типа Serial;");
             System.out.println("3 - вывести информацию об объектах;");
             System.out.println("4 - разделить массив по результатам работы бизнес-метода;");
-            System.out.println("5 - разделить массив по типам элемента;");
+            System.out.println("5 - разделить массив по типам элементов;");
             System.out.println("0 - завершение программы;");
 
             System.out.print("\nВведите номер действия: ");
@@ -71,42 +53,33 @@ public class Main{
 
 
                 case "2": //создать элемент типа Serial
-                        title = getStringInput("\nВведите название: ");
-                        rating = getIntInput("Введите рейтинг (0-5): ");
-                        l = getIntInput("Введите количество элементов: ");
-                        int[] arr = new int[l];
-                        for (int i = 0; i < l; i++) {
-                            arr[i] = getIntInput("Элемент " + (i + 1) + ": ");
-                        }
+                    title = getStringInput("\nВведите название: ");
+                    rating = getIntInput("Введите рейтинг (0-5): ");
+                    l = getIntInput("Введите количество элементов: ");
+                    int[] arr = new int[l];
+                    for (int i = 0; i < l; i++) {
+                        arr[i] = getIntInput("Элемент " + (i + 1) + ": ");
+                    }
 
-                        content = new Serial(title, arr, rating);
-                        System.out.println("Сериал добавлен!");
-                        contentDatabase.add(content);
+                    content = new Serial(title, arr, rating);
+                    System.out.println("Сериал добавлен!");
+                    contentDatabase.add(content);
                     break;
-//
-//
-//            case "3": //вывести информацию об объектах
-//                System.out.println("\nДлина вектора: " + vec.getLength());
-//                break;
-//
-//
-//            case "4": //мин значение вектора
-//                System.out.println("\nМин. значение вектора: " + vec.min());
-//                break;
-//
-//
-//            case "5": //макс значение вектора
-//                System.out.println("\nМакс. значение вектора: " + vec.max());
-//                break;
-//
-//
-//            case "6": //сортировка вектора по возрастанию
-//                System.out.println("\nИсходный вектор: ");
-//                vec.print();
-//                vec.insertionSort();
-//                System.out.println("\nНовый вектор: ");
-//                vec.print();
-//                break;
+
+
+                case "3": //вывести информацию об объектах
+                    showAllContent();
+                    break;
+
+
+                case "4": //разделить массив по результатам работы бизнес-метода
+                    groupByBusinessResult();
+                    break;
+
+
+                case "5": //разделить массив по типам элементов
+                    splitByType();
+                    break;
 
                 default:
                     System.out.println("Команда не распознана. Повторите ввод: ");
@@ -114,8 +87,116 @@ public class Main{
 
             }
         }
-
     }
+
+    private static void showAllContent() {
+        System.out.println("\nПОЛНАЯ ИНФОРМАЦИЯ О КОНТЕНТЕ");
+        System.out.println("═".repeat(60));
+
+        if (contentDatabase.isEmpty()) {
+            System.out.println("База данных пуста!");
+            return;
+        }
+
+        for (int i = 0; i < contentDatabase.size(); i++) {
+            System.out.println("Запись #" + (i + 1));
+            System.out.println(contentDatabase.get(i));
+        }
+    }
+
+    // Группировка по результату бизнес-метода
+    private static void groupByBusinessResult() {
+        System.out.println("\nГРУППИРОВКА ПО РЕЗУЛЬТАТУ БИЗНЕС-МЕТОДА");
+        System.out.println("═".repeat(60));
+
+        if (contentDatabase.isEmpty()) {
+            System.out.println("База данных пуста!");
+            return;
+        }
+        // Map для группировки: результат -> список объектов
+        Map<Double, List<Content>> resultGroups = new HashMap<>();
+
+        // Собираем объекты с одинаковыми результатами calculateAverage()
+        for (Content content : contentDatabase) {
+            try {
+                double result = content.calculateAverage();
+                resultGroups.computeIfAbsent(result, k -> new ArrayList<>()).add(content);
+            } catch (SeriesOperationException e) {
+                System.out.println("Пропуск '" + content.getTitle() + "': " + e.getMessage());
+            }
+        }
+        if (resultGroups.isEmpty()) {
+            System.out.println("Нет данных для группировки");
+            return;
+        }
+        // Выводим группы
+        int groupNumber = 1;
+        for (Map.Entry<Double, List<Content>> entry : resultGroups.entrySet()) {
+            if (entry.getValue().size() > 1) { // Показываем только группы с >1 объектом
+                System.out.println("\nГруппа " + groupNumber++ + " (результат: " + entry.getKey() + "):");
+                for (Content content : entry.getValue()) {
+                    System.out.println("   - " + content.getTitle() +
+                            " (" + getContentType(content) + ")");
+                }
+            }
+        }
+        if (groupNumber == 1) {
+            System.out.println("ℹНет объектов с одинаковыми результатами бизнес-метода");
+        }
+    }
+
+    private static String getContentType(Content content) {
+        if (content instanceof BooksSeries) return "Книжная серия";
+        else if (content instanceof Serial) return "Сериал";
+        else return "Неизвестный тип";
+    }
+
+    private static void splitByType() {
+        System.out.println("\nРАЗДЕЛЕНИЕ ПО ТИПАМ ОБЪЕКТОВ");
+        System.out.println("═".repeat(60));
+
+        if (contentDatabase.isEmpty()) {
+            System.out.println("База данных пуста!");
+            return;
+        }
+
+        // Создаем два массива для разных типов
+        List<BooksSeries> bookSeriesList = new ArrayList<>();
+        List<Serial> serialList = new ArrayList<>();
+
+        // Разделяем объекты по реальному типу
+        for (Content content : contentDatabase) {
+            if (content instanceof BooksSeries) {
+                bookSeriesList.add((BooksSeries) content);
+            } else if (content instanceof Serial) {
+                serialList.add((Serial) content);
+            }
+        }
+
+        // Выводим результаты
+        System.out.println("КНИЖНЫЕ СЕРИИ (" + bookSeriesList.size() + "):");
+        if (bookSeriesList.isEmpty()) {
+            System.out.println("Нет книжных серий");
+        } else {
+            for (BooksSeries bookSeries : bookSeriesList) {
+                System.out.println("   - " + bookSeries.getTitle() +
+                        " | Книг: " + bookSeries.getArray().length +
+                        " | Рейтинг: " + bookSeries.getRating() + "/5");
+            }
+        }
+
+        System.out.println("\nСЕРИАЛЫ (" + serialList.size() + "):");
+        if (serialList.isEmpty()) {
+            System.out.println("Нет сериалов");
+        } else {
+            for (Serial serial : serialList) {
+                System.out.println("   - " + serial.getTitle() +
+                        " | Сезонов: " + serial.getArray().length +
+                        " | Рейтинг: " + serial.getRating() + "/5");
+            }
+        }
+    }
+
     private static int getIntInput (String prompt){
         Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -133,4 +214,6 @@ public class Main{
         System.out.print(prompt);
         return scanner.nextLine();
     }
+
+
 }
