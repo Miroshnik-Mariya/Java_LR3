@@ -2,6 +2,7 @@ package Classes;
 
 import Exception.*;
 import Interfaces.Content;
+import java.util.Arrays;
 
 public class BooksSeries implements Content {
     private String title;
@@ -84,28 +85,28 @@ public class BooksSeries implements Content {
         return rating;
     }
 
-
-    @Override
-    public String toString() {
-        double avg = calculateAverage();
-        String avgString = String.format("%.1f", avg);
-
-        return String.format("""
-                        ═══════════════════════════════════
-                                     СЕРИЯ КНИГ
-                        ═══════════════════════════════════
-                          Название: %-20s
-                          Количество книг: %2d
-                          Рейтинг: %1d
-                          Среднее кол-во стр в книге: %5s
-                        ═══════════════════════════════════
-                        """,
-                title.length() > 20 ? title.substring(0, 17) + "..." : title,
-                pagesSeries.length,
-                rating,
-                avgString
-        );
-    }
+//
+//    @Override
+//    public String toString() {
+//        double avg = calculateAverage();
+//        String avgString = String.format("%.1f", avg);
+//
+//        return String.format("""
+//                        ═══════════════════════════════════
+//                                     СЕРИЯ КНИГ
+//                        ═══════════════════════════════════
+//                          Название: %-20s
+//                          Количество книг: %2d
+//                          Рейтинг: %1d
+//                          Среднее кол-во стр в книге: %5s
+//                        ═══════════════════════════════════
+//                        """,
+//                title.length() > 20 ? title.substring(0, 17) + "..." : title,
+//                pagesSeries.length,
+//                rating,
+//                avgString
+//        );
+//    }
 
     @Override
     public double calculateAverage() throws SeriesOperationException {
@@ -119,4 +120,69 @@ public class BooksSeries implements Content {
         }
         return (double) sum / pagesSeries.length;
     }
+
+
+
+    @Override
+    public String toString() {
+        try {
+            double avgPages = calculateAverage();
+            return String.format("""
+                            ═══════════════════════════════════
+                                         СЕРИЯ КНИГ
+                            ═══════════════════════════════════
+                              Название: %s
+                              Книг: %d
+                              Рейтинг: %d/5
+                              Среднее: %.1f стр.
+                            ═══════════════════════════════════
+                            """,
+                    title.length() > 20 ? title.substring(0, 17) + "..." : title,
+                    pagesSeries.length,
+                    rating,
+                    avgPages
+            );
+        } catch (SeriesOperationException e) {
+            return String.format("""
+                            ═══════════════════════════════════
+                                         СЕРИЯ КНИГ
+                            ═══════════════════════════════════
+                              Название: %s
+                              Книг: %d
+                              Рейтинг: %d/5
+                              Среднее: ошибка расчета
+                            ═══════════════════════════════════
+                            """,
+                    title.length() > 20 ? title.substring(0, 17) + "..." : title,
+                    pagesSeries.length,
+                    rating
+            );
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        // 1. Проверка на ссылочную идентичность
+        if (this == obj) return true;
+
+        // 2. Проверка на null и совпадение класса
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        // 3. Приведение типа
+        BooksSeries that = (BooksSeries) obj;
+
+        // 4. Сравнение всех значимых полей
+        return rating == that.rating &&
+                title.equals(that.title) &&
+                Arrays.equals(pagesSeries, that.pagesSeries);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = title.hashCode();
+        result = 31 * result + Arrays.hashCode(pagesSeries);
+        result = 31 * result + rating;
+        return result;
+    }
+
 }

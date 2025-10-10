@@ -2,6 +2,7 @@ package Classes;
 
 import Exception.*;
 import Interfaces.Content;
+import java.util.Arrays;
 
 public class Serial implements Content {
     private String title;
@@ -85,27 +86,27 @@ public class Serial implements Content {
         return rating;
     }
 
-    @Override
-    public String toString() {
-        double avg = calculateAverage();
-        String avgString = String.format("%.1f", avg);
-
-        return String.format("""
-                        ═══════════════════════════════════
-                                       СЕРИАЛ
-                        ═══════════════════════════════════
-                          Название: %-20s
-                          Количество сезонов: %2d
-                          Рейтинг: %1d
-                          Среднее кол-во серий в сезоне: %3s
-                        ═══════════════════════════════════
-                        """,
-                title.length() > 20 ? title.substring(0, 17) + "..." : title,
-                episodesSeason.length,
-                rating,
-                avgString
-        );
-    }
+//    @Override
+//    public String toString() {
+//        double avg = calculateAverage();
+//        String avgString = String.format("%.1f", avg);
+//
+//        return String.format("""
+//                        ═══════════════════════════════════
+//                                       СЕРИАЛ
+//                        ═══════════════════════════════════
+//                          Название: %-20s
+//                          Количество сезонов: %2d
+//                          Рейтинг: %1d
+//                          Среднее кол-во серий в сезоне: %3s
+//                        ═══════════════════════════════════
+//                        """,
+//                title.length() > 20 ? title.substring(0, 17) + "..." : title,
+//                episodesSeason.length,
+//                rating,
+//                avgString
+//        );
+ //   }
 
     @Override
     public double calculateAverage() throws SeriesOperationException {
@@ -118,5 +119,62 @@ public class Serial implements Content {
             sum += pages;
         }
         return sum/episodesSeason.length;
+    }
+
+    @Override
+    public String toString() {
+        try {
+            double avgEpisodes = calculateAverage();
+            return String.format("""
+                            ═══════════════════════════════════
+                                         СЕРИАЛ
+                            ═══════════════════════════════════
+                              Название: %s
+                              Сезонов: %2d
+                              Рейтинг: %d/5
+                              Среднее: %.1f серий/сезон
+                            ═══════════════════════════════════
+                            """,
+                    title.length() > 20 ? title.substring(0, 17) + "..." : title,
+                    episodesSeason.length,
+                    rating,
+                    avgEpisodes
+            );
+        } catch (SeriesOperationException e) {
+            return String.format("""
+                            ═══════════════════════════════════
+                                         СЕРИАЛ
+                            ═══════════════════════════════════
+                              Название: %s
+                              Сезонов: %2d
+                              Рейтинг: %d/5
+                              Среднее: ошибка расчета
+                            ═══════════════════════════════════
+                            """,
+                    title.length() > 20 ? title.substring(0, 17) + "..." : title,
+                    episodesSeason.length,
+                    rating
+            );
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        Serial that = (Serial) obj;
+
+        return rating == that.rating &&
+                title.equals(that.title) &&
+                Arrays.equals(episodesSeason, that.episodesSeason);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = title.hashCode();
+        result = 31 * result + Arrays.hashCode(episodesSeason);
+        result = 31 * result + rating;
+        return result;
     }
 }
