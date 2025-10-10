@@ -16,10 +16,11 @@ public class BooksSeries implements Content {
 
     public BooksSeries(String title, int[] pagesSeries, int rating) {
         setTitle(title);
-        setPagesSeries(pagesSeries);
+        setArray(pagesSeries);
         setRating(rating);
     }
 
+    @Override
     public void setTitle(String title) {
         if (title == null || title.trim().isEmpty()) {
             throw new InvalidDataException("Введено пустое название.");
@@ -27,12 +28,13 @@ public class BooksSeries implements Content {
         this.title = title;
     }
 
+    @Override
     public String getTitle() {
         return title;
     }
 
-
-    public void setPagesSeries(int[] pagesSeries) {
+    @Override
+    public void setArray(int[] pagesSeries) {
         if (pagesSeries == null) {
             throw new InvalidDataException("Неверно указано количество страниц в книгах серии.");
         }
@@ -44,19 +46,31 @@ public class BooksSeries implements Content {
         this.pagesSeries = pagesSeries.clone();
     }
 
-    public int[] getPagesSeries() {
+    @Override
+    public int[] getArray() {
         //проверка на массив с длиной 0
         return pagesSeries;
     }
 
-    public int getForIndex(int idx) {
+    @Override
+    public int getElement(int idx) {
         if (idx < 0 || idx > pagesSeries.length - 1) {
             throw new InvalidDataException("Индекс вышел за границы массива.");
         }
         return pagesSeries[idx];
     }
 
+    @Override
+    public void setElement(int idx, int value){
+        if (idx < 0 || idx > pagesSeries.length - 1) {
+            throw new InvalidDataException("Индекс вышел за границы массива.");
+        }
+        else{
+            pagesSeries[idx]=value;
+        }
+    }
 
+    @Override
     public void setRating(int rating) {
         if (rating >= 0 && rating < 6) {
             this.rating = rating;
@@ -65,6 +79,7 @@ public class BooksSeries implements Content {
         }
     }
 
+    @Override
     public int getRating() {
         return rating;
     }
@@ -72,6 +87,9 @@ public class BooksSeries implements Content {
 
     @Override
     public String toString() {
+        double avg = calculateAverage();
+        String avgString = String.format("%.1f", avg);
+
         return String.format("""
                         ═══════════════════════════════════
                                      СЕРИЯ КНИГ
@@ -79,14 +97,17 @@ public class BooksSeries implements Content {
                           Название: %-20s
                           Количество книг: %2d
                           Рейтинг: %1d
+                          Среднее кол-во стр в книге: %5s
                         ═══════════════════════════════════
                         """,
                 title.length() > 20 ? title.substring(0, 17) + "..." : title,
                 pagesSeries.length,
-                rating
+                rating,
+                avgString
         );
     }
 
+    @Override
     public double calculateAverage() throws SeriesOperationException {
         if (pagesSeries.length == 0) {
             throw new SeriesOperationException("Серия не содержит книг");

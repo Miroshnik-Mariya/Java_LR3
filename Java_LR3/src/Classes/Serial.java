@@ -17,10 +17,11 @@ public class Serial implements Content {
 
     public Serial(String title, int[] episodesSeason, int rating) {
         setTitle(title);
-        setEpisodesSeason(episodesSeason);
+        setArray(episodesSeason);
         setRating(rating);
     }
 
+    @Override
     public void setTitle(String title) {
         if (title == null || title.trim().isEmpty()) {
             throw new InvalidDataException("Введено пустое название.");
@@ -28,12 +29,13 @@ public class Serial implements Content {
         this.title = title;
     }
 
+    @Override
     public String getTitle() {
         return title;
     }
 
-
-    public void setEpisodesSeason(int[] episodesSeason) {
+    @Override
+    public void setArray(int[] episodesSeason) {
         if (episodesSeason == null) {
             throw new InvalidDataException("Неверно указано количество серий в каждом сезоне.");
         }
@@ -45,18 +47,31 @@ public class Serial implements Content {
         this.episodesSeason = episodesSeason.clone();
     }
 
-    public int[] getEpisodesSeason() {
+    @Override
+    public int[] getArray() {
         //проверка на массив с длиной 0
         return episodesSeason;
     }
 
-    public int getForIndex(int idx) {
+    @Override
+    public int getElement(int idx) {
         if (idx < 0 || idx > episodesSeason.length - 1) {
             throw new InvalidDataException("Индекс вышел за границы массива.");
         }
         return episodesSeason[idx];
     }
 
+    @Override
+    public void setElement(int idx, int value){
+        if (idx < 0 || idx > episodesSeason.length - 1) {
+            throw new InvalidDataException("Индекс вышел за границы массива.");
+        }
+        else{
+            episodesSeason[idx]=value;
+        }
+    }
+
+    @Override
     public void setRating(int rating) {
         if (rating >= 0 && rating < 6) {
             this.rating = rating;
@@ -65,16 +80,16 @@ public class Serial implements Content {
         }
     }
 
+    @Override
     public int getRating() {
         return rating;
     }
 
-    public static void Show() {
-        System.out.println();
-    }
-
     @Override
     public String toString() {
+        double avg = calculateAverage();
+        String avgString = String.format("%.1f", avg);
+
         return String.format("""
                         ═══════════════════════════════════
                                        СЕРИАЛ
@@ -82,15 +97,17 @@ public class Serial implements Content {
                           Название: %-20s
                           Количество сезонов: %2d
                           Рейтинг: %1d
+                          Среднее кол-во серий в сезоне: %3s
                         ═══════════════════════════════════
                         """,
                 title.length() > 20 ? title.substring(0, 17) + "..." : title,
                 episodesSeason.length,
-                rating
+                rating,
+                avgString
         );
     }
 
-
+    @Override
     public double calculateAverage() throws SeriesOperationException {
         if (episodesSeason.length == 0) {
             throw new SeriesOperationException("Серия не содержит книг");
@@ -101,6 +118,5 @@ public class Serial implements Content {
             sum += pages;
         }
         return sum/episodesSeason.length;
-
     }
 }
