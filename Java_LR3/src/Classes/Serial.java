@@ -12,14 +12,30 @@ public class Serial implements Content {
 
     public Serial() {
         title = "Unknown title";
-        episodesSeason = new int[0];
+        episodesSeason = new int[1];
         rating = 0;
     }
 
     public Serial(String title, int[] episodesSeason, int rating) {
-        setTitle(title);
-        setArray(episodesSeason);
-        setRating(rating);
+        if (title == null || title.trim().isEmpty()) {
+            throw new InvalidDataException("Введено пустое название.");
+        }
+        this.title = title;
+
+        if (episodesSeason == null) {
+            throw new InvalidDataException("Неверно указано количество страниц.");
+        }
+        for (int pages : episodesSeason) {
+            if (pages < 0) {
+                throw new InvalidDataException("Количество страниц не может быть отрицательным.");
+            }
+        }
+        this.episodesSeason = episodesSeason.clone();
+
+        if (rating < 0 || rating > 5) {
+            throw new InvalidDataException("Рейтинг должен быть от 0 до 5.");
+        }
+        this.rating = rating;
     }
 
     @Override
@@ -111,7 +127,7 @@ public class Serial implements Content {
     @Override
     public double calculateAverage() throws SeriesOperationException {
         if (episodesSeason.length == 0) {
-            throw new SeriesOperationException("Серия не содержит книг");
+            throw new SeriesOperationException("Сезон не содержит эпизодов.");
         }
         double res = 0;
         int sum = 0;

@@ -11,14 +11,37 @@ public class BooksSeries implements Content {
 
     public BooksSeries() {
         title = "Unknown title";
-        pagesSeries = new int[0];
+        pagesSeries = new int[1];
         rating = 0;
     }
 
+//    public BooksSeries(String title, int[] pagesSeries, int rating) {
+//        setTitle(title);
+//        setArray(pagesSeries);
+//        setRating(rating);
+//    }
+
+
     public BooksSeries(String title, int[] pagesSeries, int rating) {
-        setTitle(title);
-        setArray(pagesSeries);
-        setRating(rating);
+        if (title == null || title.trim().isEmpty()) {
+            throw new InvalidDataException("Введено пустое название.");
+        }
+        this.title = title;
+
+        if (pagesSeries == null) {
+            throw new InvalidDataException("Неверно указано количество страниц.");
+        }
+        for (int pages : pagesSeries) {
+            if (pages < 0) {
+                throw new InvalidDataException("Количество страниц не может быть отрицательным.");
+            }
+        }
+        this.pagesSeries = pagesSeries.clone();
+
+        if (rating < 0 || rating > 5) {
+            throw new InvalidDataException("Рейтинг должен быть от 0 до 5.");
+        }
+        this.rating = rating;
     }
 
     @Override

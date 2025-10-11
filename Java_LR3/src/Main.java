@@ -113,7 +113,6 @@ public class Main{
             System.out.println("База данных пуста!");
             return;
         }
-        // Map для группировки: результат -> список объектов
         Map<Double, List<Content>> resultGroups = new HashMap<>();
 
         // Собираем объекты с одинаковыми результатами calculateAverage()
@@ -132,7 +131,7 @@ public class Main{
         // Выводим группы
         int groupNumber = 1;
         for (Map.Entry<Double, List<Content>> entry : resultGroups.entrySet()) {
-            if (entry.getValue().size() > 1) { // Показываем только группы с >1 объектом
+            if (entry.getValue().size() > 1) {
                 System.out.println("\nГруппа " + groupNumber++ + " (результат: " + entry.getKey() + "):");
                 for (Content content : entry.getValue()) {
                     System.out.println("   - " + content.getTitle() +
