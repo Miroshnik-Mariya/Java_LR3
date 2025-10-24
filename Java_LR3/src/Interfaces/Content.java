@@ -1,6 +1,8 @@
 package Interfaces;
 
-import Exception.SeriesOperationException; 
+import Exception.SeriesOperationException;
+
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 
@@ -18,10 +20,10 @@ public interface Content {
     void setElement(int index, int value);
 
     //записи в байтовый поток
-    void output(OutputStream out);
+    void output(OutputStream out) throws IOException;
 
     //записи в символьный поток
-    void write(Writer out);
+    void write(Writer out) throws IOException;
 
 
     double calculateAverage() throws SeriesOperationException;

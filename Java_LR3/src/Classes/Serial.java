@@ -2,6 +2,8 @@ package Classes;
 
 import Exception.*;
 import Interfaces.Content;
+
+import java.io.*;
 import java.util.Arrays;
 
 public class Serial implements Content {
@@ -192,5 +194,28 @@ public class Serial implements Content {
         result = 31 * result + Arrays.hashCode(episodesSeason);
         result = 31 * result + rating;
         return result;
+    }
+
+
+    //записи в байтовый поток
+    @Override
+    public void output(OutputStream out) throws IOException {
+        DataOutputStream text = new DataOutputStream(out);
+        text.writeUTF(title);
+        text.writeInt(rating);
+        //dos.writeInt(bookPages.length);
+        for (int v : episodesSeason) text.writeInt(v);
+        text.flush();
+    }
+
+
+    //записи в символьный поток
+    @Override
+    public void write(Writer out) throws IOException{
+        PrintWriter pw = new PrintWriter(out);
+        pw.print(title + " " + rating);
+        for (int v : episodesSeason) pw.print(" " + v);
+        //pw.println();
+        pw.flush();
     }
 }

@@ -2,6 +2,9 @@ package Classes;
 
 import Exception.*;
 import Interfaces.Content;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class BooksSeries implements Content {
@@ -208,4 +211,45 @@ public class BooksSeries implements Content {
         return result;
     }
 
+
+
+//    public void output(OutputStream out) {
+//        try {
+//            String data = "Title: " + getTitle() + "\n" +
+//                    "Pages Series: " + Arrays.toString(getArray()) + "\n" +
+//                    "Rating: " + getRating() + "\n";
+//            out.write(data.getBytes(StandardCharsets.UTF_8));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+    //записи в байтовый поток
+    @Override
+    public void output(OutputStream out) throws IOException {
+        DataOutputStream text = new DataOutputStream(out);
+        text.writeUTF(title);
+        text.writeInt(rating);
+        //dos.writeInt(bookPages.length);
+        for (int v : pagesSeries) text.writeInt(v);
+        text.flush();
+    }
+
+
+    //записи в символьный поток
+    @Override
+    public void write(Writer out) throws IOException{
+//        try {
+//            out.write("Title: " + getTitle() + "\n");
+//            out.write("Pages Series: " + Arrays.toString(getArray()) + "\n");
+//            out.write("Rating: " + getRating() + "\n");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        PrintWriter pw = new PrintWriter(out);
+        pw.print(title + " " + rating);
+        for (int v : pagesSeries) pw.print(" " + v);
+        //pw.println();
+        pw.flush();
+    }
 }
