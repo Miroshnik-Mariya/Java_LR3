@@ -4,9 +4,10 @@ import Exception.SeriesOperationException;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.io.Writer;
 
-public interface Content {
+public interface Content extends Serializable {
     String getTitle();
     void setTitle(String title);
 

@@ -1,92 +1,68 @@
 import Classes.*;
+import Classes.Serial;
 import Interfaces.*;
 import Exception.*;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.*;
 
-public class Main{
+public class Main {
     static List<Content> contentDatabase = new ArrayList<>();
+    static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         System.out.println("Лабораторная работа №3. Выполнила студентка группы 6301-020302D\nМирошник Мария");
-        Scanner scanner = new Scanner(System.in);
-
-        int l = 0;
-        String title = "";
-        int rating = 0;
-        Content content;
 
         boolean flag = true;
 
         while (flag) {
             System.out.println("\n\nВыберите действие: ");
-            System.out.println("1 - создать элемент типа BookSeries;");
-            System.out.println("2 - создать элемент типа Serial;");
-            System.out.println("3 - вывести информацию об объектах;");
-            System.out.println("4 - разделить массив по результатам работы бизнес-метода;");
-            System.out.println("5 - разделить массив по типам элементов;");
-            System.out.println("0 - завершение программы;");
+            System.out.println("1. Заполнение базы элементов с консоли");
+            System.out.println("2. Байтовый ввод/вывод (Задание 1)");
+            System.out.println("3. Текстовый ввод/вывод (Задание 1)");
+            System.out.println("4. Сериализация/десериализация (Задание 2)");
+            System.out.println("5. Форматный текстовый ввод/вывод (Задание 3)");
+            System.out.println("6. Показать все публикации");
+            System.out.println("0. Выход");
+            System.out.print("Выберите действие: ");
 
-            System.out.print("\nВведите номер действия: ");
-            String menu = scanner.next();
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // очистка буфера
 
-            switch (menu) {
-                case "0": //выход
-                    System.out.println("До новых встреч!");
-                    flag = false;
-                    break;
-
-
-                case "1": //создать элемент типа BookSeries
-                    title = getStringInput("\nВведите название: ");
-                    rating = getIntInput("Введите рейтинг (0-5): ");
-                    l = getIntInput("Введите количество элементов: ");
-                    int[] array = new int[l];
-                    for (int i = 0; i < l; i++) {
-                        array[i] = getIntInput("Элемент " + (i + 1) + ": ");
-                    }
-
-                    content = new BooksSeries(title, array, rating);
-                    System.out.println("Книжная серия добавлена!");
-                    contentDatabase.add(content);
-                    break;
-
-
-                case "2": //создать элемент типа Serial
-                    title = getStringInput("\nВведите название: ");
-                    rating = getIntInput("Введите рейтинг (0-5): ");
-                    l = getIntInput("Введите количество элементов: ");
-                    int[] arr = new int[l];
-                    for (int i = 0; i < l; i++) {
-                        arr[i] = getIntInput("Элемент " + (i + 1) + ": ");
-                    }
-
-                    content = new Serial(title, arr, rating);
-                    System.out.println("Сериал добавлен!");
-                    contentDatabase.add(content);
-                    break;
-
-
-                case "3": //вывести информацию об объектах
-                    showAllContent();
-                    break;
-
-
-                case "4": //разделить массив по результатам работы бизнес-метода
-                    groupByBusinessResult();
-                    break;
-
-
-                case "5": //разделить массив по типам элементов
-                    splitByType();
-                    break;
-
-                default:
-                    System.out.println("Команда не распознана. Повторите ввод: ");
-                    scanner.next();
-
+            try {
+                switch (choice) {
+                    case 0: //выход
+                        System.out.println("До новых встреч!");
+                        flag = false;
+                        break;
+                    case 1:
+                        fillFromConsole();
+                        break;
+                    case 2:
+                        byteStreamOperations();
+                        break;
+                    case 3:
+                        textStreamOperations();
+                        break;
+                    case 4:
+                        serializationOperations();
+                        break;
+                    case 5:
+                        formattedTextOperations();
+                        break;
+                    case 6:
+                        showAllContent();
+                        break;
+                    default:
+                        System.out.println("Команда не распознана. Повторите ввод: ");
+                }
+            } catch (Exception e) {
+                System.out.println("Ошибка: " + e.getMessage());
+                e.printStackTrace();
             }
         }
+        scanner.close();
     }
 
     private static void showAllContent() {
@@ -107,8 +83,6 @@ public class Main{
     // Группировка по результату бизнес-метода
     private static void groupByBusinessResult() {
         System.out.println("\nГРУППИРОВКА ПО РЕЗУЛЬТАТУ БИЗНЕС-МЕТОДА");
-        System.out.println("═".repeat(60));
-
         if (contentDatabase.isEmpty()) {
             System.out.println("База данных пуста!");
             return;
@@ -196,8 +170,7 @@ public class Main{
         }
     }
 
-    private static int getIntInput (String prompt){
-        Scanner scanner = new Scanner(System.in);
+    private static int getIntInput(String prompt) {
         while (true) {
             try {
                 System.out.print(prompt);
@@ -208,11 +181,172 @@ public class Main{
         }
     }
 
-    private static String getStringInput (String prompt){
-        Scanner scanner = new Scanner(System.in);
+    private static String getStringInput(String prompt) {
         System.out.print(prompt);
         return scanner.nextLine();
     }
 
+    // 1. Заполнение базы элементов с консоли
+    private static void fillFromConsole() throws IOException {
+        System.out.println("\nЗАПОЛНЕНИЕ БАЗЫ С КОНСОЛИ");
 
+        while (true) {
+            System.out.println("\nВыберите тип элемента:");
+            System.out.println("1. BooksSeries (Серия книг)");
+            System.out.println("2. Serial (Сериал)");
+            System.out.println("0. Завершить ввод");
+            System.out.print("Ваш выбор: ");
+
+            int typeChoice = scanner.nextInt();
+            scanner.nextLine();
+
+            if (typeChoice == 0) break;
+            if (typeChoice != 1 && typeChoice != 2) {
+                System.out.println("Неверный выбор типа!");
+                continue;
+            }
+
+            System.out.print("Введите название: ");
+            String title = scanner.nextLine();
+
+            System.out.print("Введите рейтинг (0-5): ");
+            int rating = scanner.nextInt();
+
+            System.out.print("Введите количество элементов (книг/сезонов): ");
+            int count = scanner.nextInt();
+
+            int[] elements = new int[count];
+            for (int i = 0; i < count; i++) {
+                System.out.print("Введите значение элемента " + (i + 1) + ": ");
+                elements[i] = scanner.nextInt();
+            }
+            scanner.nextLine(); // очистка буфера
+            Content content;
+            if (typeChoice == 1) {
+                content = new BooksSeries(title, elements, rating);
+            } else {
+                content = new Serial(title, elements, rating);
+            }
+            contentDatabase.add(content);
+            System.out.println("Публикация добавлена: " + content.getTitle());
+        }
+
+        System.out.println("База заполнена. Всего элементов: " + contentDatabase.size());
+    }
+
+    // 2. Байтовый ввод/вывод (Задание 1)
+    private static void byteStreamOperations() throws IOException {
+        System.out.println("\nБАЙТОВЫЙ ВВОД/ВЫВОД");
+
+        if (contentDatabase.isEmpty()) {
+            System.out.println("В базе нет записей.");
+            return;
+        }
+        // Цикл записи в байтовый поток
+        FileOutputStream fos = new FileOutputStream("pubs_bytes.dat");
+        DataOutputStream dos = new DataOutputStream(fos);
+
+        dos.writeInt(contentDatabase.size());
+        for (Content p : contentDatabase) {
+            Helper.outputContent(p, dos);
+        }
+        dos.close();
+        System.out.println("Записано объектов: " + contentDatabase.size());
+
+        // Цикл чтения из байтового потока
+        FileInputStream fis = new FileInputStream("pubs_bytes.dat");
+        DataInputStream dis = new DataInputStream(fis);
+
+        int count = dis.readInt();
+        List<Content> loadedByte = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            loadedByte.add(Helper.inputContent(dis));
+        }
+        dis.close();
+        for (Content p : loadedByte) {
+            System.out.println("  " + p);
+        }
+    }
+
+    // 3. Текстовый ввод/вывод (Задание 1)
+    private static void textStreamOperations() throws IOException {
+        System.out.println("\nТЕКСТОВЫЙ ВВОД/ВЫВОД");
+        if (contentDatabase.isEmpty()) {
+            System.out.println("В базе нет записей.");
+            return;
+        }
+        // Цикл записи в текстовый поток
+        FileWriter fw = new FileWriter("pubs_text.txt");
+        for (Content p : contentDatabase) {
+            Helper.writeContent(p, fw);
+        }
+        fw.close();
+        System.out.println("Записано объектов: " + contentDatabase.size());
+        // Цикл чтения из текстового потока
+        FileReader fr = new FileReader("pubs_text.txt");
+        BufferedReader br = new BufferedReader(fr);
+        List<Content> loadedText = new ArrayList<>();
+        while (true) {
+            Content p = Helper.readContent(br);
+            if (p == null) break;
+            loadedText.add(p);
+        }
+        br.close();
+        for (Content p : loadedText) {
+            System.out.println("  " + p);
+        }
+    }
+
+    // 4. Сериализация/десериализация (Задание 2)
+    private static void serializationOperations() throws IOException, ClassNotFoundException {
+        System.out.println("\nСЕРИАЛИЗАЦИЯ/ДЕСЕРИАЛИЗАЦИЯ");
+        if (contentDatabase.isEmpty()) {
+            System.out.println("В базе нет записей.");
+            return;
+        }
+        // Цикл записи в байтовый поток (сериализация)
+        FileOutputStream serOut = new FileOutputStream("pubs.ser");
+        ObjectOutputStream oos = new ObjectOutputStream(serOut);
+        oos.writeObject(contentDatabase);
+        oos.close();
+        // Цикл чтения из байтового потока (десериализация)
+        FileInputStream serIn = new FileInputStream("pubs.ser");
+        ObjectInputStream ois = new ObjectInputStream(serIn);
+        List<Content> fromSer = (List<Content>) ois.readObject();
+        ois.close();
+        for (Content p : fromSer) {
+            System.out.println("  " + p);
+        }
+    }
+
+    // 5. Форматный текстовый ввод/вывод (Задание 3)
+    private static void formattedTextOperations() throws IOException {
+        System.out.println("\nФОРМАТНЫЙ ТЕКСТОВЫЙ ВВОД/ВЫВОД");
+        if (contentDatabase.isEmpty()) {
+            System.out.println("В базе нет записей.");
+            return;
+        }
+        // Настройка локали для корректного преобразования вещественных чисел
+        Locale.setDefault(Locale.US);
+        FileWriter fw = new FileWriter("pubs_formatted.txt");
+        for (Content p : contentDatabase) {
+            Helper.writeFormatContent(p, fw);
+        }
+        fw.close();
+        // Цикл чтения из текстового потока
+        FileReader fr = new FileReader("pubs_formatted.txt");
+        Scanner fileScanner = new Scanner(fr);
+        List<Content> loadedFormatted = new ArrayList<>();
+        while (fileScanner.hasNextLine()) {
+            Content p = Helper.readFormatContent(fileScanner);
+            if (p != null) {
+                loadedFormatted.add(p);
+            }
+        }
+        fileScanner.close();
+        fr.close();
+        for (Content p : loadedFormatted) {
+            System.out.println("  " + p);
+        }
+    }
 }

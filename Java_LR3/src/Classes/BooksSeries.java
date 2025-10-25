@@ -7,7 +7,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-public class BooksSeries implements Content {
+public class BooksSeries implements Content, Serializable {
     private String title;
     private int[] pagesSeries; //количество страниц в каждой книге серии
     private int rating; //рейтинг
@@ -154,14 +154,10 @@ public class BooksSeries implements Content {
         try {
             double avgPages = calculateAverage();
             return String.format("""
-                            ═══════════════════════════════════
-                                         СЕРИЯ КНИГ
-                            ═══════════════════════════════════
                               Название: %s
                               Книг: %d
                               Рейтинг: %d/5
                               Среднее: %.1f стр.
-                            ═══════════════════════════════════
                             """,
                     title.length() > 20 ? title.substring(0, 17) + "..." : title,
                     pagesSeries.length,
@@ -170,14 +166,10 @@ public class BooksSeries implements Content {
             );
         } catch (SeriesOperationException e) {
             return String.format("""
-                            ═══════════════════════════════════
-                                         СЕРИЯ КНИГ
-                            ═══════════════════════════════════
                               Название: %s
                               Книг: %d
                               Рейтинг: %d/5
                               Среднее: ошибка расчета
-                            ═══════════════════════════════════
                             """,
                     title.length() > 20 ? title.substring(0, 17) + "..." : title,
                     pagesSeries.length,
@@ -230,7 +222,7 @@ public class BooksSeries implements Content {
         DataOutputStream text = new DataOutputStream(out);
         text.writeUTF(title);
         text.writeInt(rating);
-        //dos.writeInt(bookPages.length);
+        text.writeInt(pagesSeries.length);
         for (int v : pagesSeries) text.writeInt(v);
         text.flush();
     }
@@ -247,9 +239,11 @@ public class BooksSeries implements Content {
 //            e.printStackTrace();
 //        }
         PrintWriter pw = new PrintWriter(out);
-        pw.print(title + " " + rating);
+        // Заменяем пробелы в названии на подчеркивания
+        String escapedTitle = title.replace(" ", "_");
+        pw.print(escapedTitle + " " + rating + " " + pagesSeries.length);
         for (int v : pagesSeries) pw.print(" " + v);
-        //pw.println();
+        pw.println();
         pw.flush();
     }
 }

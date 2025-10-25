@@ -6,7 +6,7 @@ import Interfaces.Content;
 import java.io.*;
 import java.util.Arrays;
 
-public class Serial implements Content {
+public class Serial implements Content, Serializable {
     private String title;
     private int[] episodesSeason; //количество серий в каждом сезоне
     private int rating; //рейтинг
@@ -144,14 +144,10 @@ public class Serial implements Content {
         try {
             double avgEpisodes = calculateAverage();
             return String.format("""
-                            ═══════════════════════════════════
-                                         СЕРИАЛ
-                            ═══════════════════════════════════
                               Название: %s
                               Сезонов: %2d
                               Рейтинг: %d/5
                               Среднее: %.1f серий/сезон
-                            ═══════════════════════════════════
                             """,
                     title.length() > 20 ? title.substring(0, 17) + "..." : title,
                     episodesSeason.length,
@@ -160,14 +156,10 @@ public class Serial implements Content {
             );
         } catch (SeriesOperationException e) {
             return String.format("""
-                            ═══════════════════════════════════
-                                         СЕРИАЛ
-                            ═══════════════════════════════════
                               Название: %s
                               Сезонов: %2d
                               Рейтинг: %d/5
                               Среднее: ошибка расчета
-                            ═══════════════════════════════════
                             """,
                     title.length() > 20 ? title.substring(0, 17) + "..." : title,
                     episodesSeason.length,
@@ -203,7 +195,7 @@ public class Serial implements Content {
         DataOutputStream text = new DataOutputStream(out);
         text.writeUTF(title);
         text.writeInt(rating);
-        //dos.writeInt(bookPages.length);
+        text.writeInt(episodesSeason.length);
         for (int v : episodesSeason) text.writeInt(v);
         text.flush();
     }
@@ -213,9 +205,11 @@ public class Serial implements Content {
     @Override
     public void write(Writer out) throws IOException{
         PrintWriter pw = new PrintWriter(out);
-        pw.print(title + " " + rating);
+        // Заменяем пробелы в названии на подчеркивания
+        String escapedTitle = title.replace(" ", "_");
+        pw.print(escapedTitle + " " + rating + " " + episodesSeason.length);
         for (int v : episodesSeason) pw.print(" " + v);
-        //pw.println();
+        pw.println();
         pw.flush();
     }
 }
