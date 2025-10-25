@@ -26,6 +26,5 @@ public interface Content extends Serializable {
     //записи в символьный поток
     void write(Writer out) throws IOException;
 
-
     double calculateAverage() throws SeriesOperationException;
 }

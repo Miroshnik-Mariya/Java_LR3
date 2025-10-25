@@ -210,7 +210,14 @@ public class Main {
             String title = scanner.nextLine();
 
             System.out.print("Введите рейтинг (0-5): ");
-            int rating = scanner.nextInt();
+            int rating;
+
+            try {
+                rating = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка: введите целое число для рейтинга!");
+                continue;
+            }
 
             System.out.print("Введите количество элементов (книг/сезонов): ");
             int count = scanner.nextInt();
@@ -242,30 +249,68 @@ public class Main {
             System.out.println("В базе нет записей.");
             return;
         }
-        // Цикл записи в байтовый поток
-        FileOutputStream fos = new FileOutputStream("pubs_bytes.dat");
-        DataOutputStream dos = new DataOutputStream(fos);
-
+////        // Цикл записи в байтовый поток
+////        FileOutputStream fos = new FileOutputStream("pubs_bytes.dat");
+////        DataOutputStream dos = new DataOutputStream(fos);
+////
+////        dos.writeInt(contentDatabase.size());
+////        for (Content p : contentDatabase) {
+////            Helper.outputContent(p, dos);
+////        }
+////        dos.close();
+////        System.out.println("Записано объектов: " + contentDatabase.size());
+////
+////        // Цикл чтения из байтового потока
+////        FileInputStream fis = new FileInputStream("pubs_bytes.dat");
+////        DataInputStream dis = new DataInputStream(fis);
+////
+////        int count = dis.readInt();
+////        List<Content> loadedByte = new ArrayList<>();
+////        for (int i = 0; i < count; i++) {
+////            loadedByte.add(Helper.inputContent(dis));
+////        }
+////        dis.close();
+////        for (Content p : loadedByte) {
+////            System.out.println("  " + p);
+////        }
+//
+//        // Цикл записи в байтовый поток
+//        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream("pubs_bytes.dat"))) {
+//            dos.writeInt(contentDatabase.size());
+//            for (Content p : contentDatabase) {
+//                Helper.outputContent(p, dos);
+//            }
+//        }
+//        // Цикл чтения из байтового потока
+//        try (DataInputStream dis = new DataInputStream(new FileInputStream("pubs_bytes.dat"))) {
+//            int count = dis.readInt();
+//            List<Content> loadedByte = new ArrayList<>();
+//            for (int i = 0; i < count; i++) {
+//                loadedByte.add(Helper.inputContent(dis));
+//            }
+//            for (Content p : loadedByte) {
+//                System.out.println("  " + p);
+//            }
+        DataOutputStream dos = new DataOutputStream(new FileOutputStream("pubs_bytes.dat"));
         dos.writeInt(contentDatabase.size());
         for (Content p : contentDatabase) {
             Helper.outputContent(p, dos);
         }
         dos.close();
-        System.out.println("Записано объектов: " + contentDatabase.size());
 
-        // Цикл чтения из байтового потока
-        FileInputStream fis = new FileInputStream("pubs_bytes.dat");
-        DataInputStream dis = new DataInputStream(fis);
-
+        // Чтение из байтового потока
+        DataInputStream dis = new DataInputStream(new FileInputStream("pubs_bytes.dat"));
         int count = dis.readInt();
         List<Content> loadedByte = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             loadedByte.add(Helper.inputContent(dis));
         }
         dis.close();
+
         for (Content p : loadedByte) {
             System.out.println("  " + p);
         }
+
     }
 
     // 3. Текстовый ввод/вывод (Задание 1)
@@ -275,26 +320,25 @@ public class Main {
             System.out.println("В базе нет записей.");
             return;
         }
-        // Цикл записи в текстовый поток
-        FileWriter fw = new FileWriter("pubs_text.txt");
-        for (Content p : contentDatabase) {
-            Helper.writeContent(p, fw);
+        // Запись в текстовый файл
+        try (FileWriter fw = new FileWriter("pubs_text.txt")) {
+            for (Content p : contentDatabase) {
+                Helper.writeContent(p, fw);
+            }
         }
-        fw.close();
         System.out.println("Записано объектов: " + contentDatabase.size());
-        // Цикл чтения из текстового потока
-        FileReader fr = new FileReader("pubs_text.txt");
-        BufferedReader br = new BufferedReader(fr);
-        List<Content> loadedText = new ArrayList<>();
-        while (true) {
-            Content p = Helper.readContent(br);
-            if (p == null) break;
-            loadedText.add(p);
+
+        // Чтение из файла
+        FileReader reader = new FileReader("pubs_text.txt");
+        StringBuilder sb = new StringBuilder();
+        int ch;
+        while ((ch = reader.read()) != -1) {
+            sb.append((char) ch);
         }
-        br.close();
-        for (Content p : loadedText) {
-            System.out.println("  " + p);
-        }
+        String contentStr = sb.toString();
+        reader.close();
+        System.out.println("Прочитано из файла:");
+        System.out.println(contentStr);
     }
 
     // 4. Сериализация/десериализация (Задание 2)
@@ -304,16 +348,26 @@ public class Main {
             System.out.println("В базе нет записей.");
             return;
         }
-        // Цикл записи в байтовый поток (сериализация)
         FileOutputStream serOut = new FileOutputStream("pubs.ser");
         ObjectOutputStream oos = new ObjectOutputStream(serOut);
-        oos.writeObject(contentDatabase);
+        oos.writeInt(contentDatabase.size());
+        for (Content content : contentDatabase) {
+            oos.writeObject(content);
+        }
         oos.close();
-        // Цикл чтения из байтового потока (десериализация)
+        System.out.println("Сериализация завершена. Записано объектов: " + contentDatabase.size());
+
+        // ДЕСЕРИАЛИЗАЦИЯ
         FileInputStream serIn = new FileInputStream("pubs.ser");
         ObjectInputStream ois = new ObjectInputStream(serIn);
-        List<Content> fromSer = (List<Content>) ois.readObject();
+        int objectCount = ois.readInt();
+        List<Content> fromSer = new ArrayList<>();
+        for (int i = 0; i < objectCount; i++) {
+            Content content = (Content) ois.readObject();
+            fromSer.add(content);
+        }
         ois.close();
+        System.out.println("Десериализация завершена. Прочитано объектов: " + fromSer.size());
         for (Content p : fromSer) {
             System.out.println("  " + p);
         }

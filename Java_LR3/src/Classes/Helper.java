@@ -64,72 +64,68 @@ public class Helper {
 //        return new BooksSeries(title, arr, rating);
 
     //чтение из символьного потока
-        public static Content readContent(BufferedReader br) throws IOException {
-            String line = br.readLine();
-            if (line == null || line.trim().isEmpty()) {
-                return null; // Конец файла или пустая строка
+
+        public static Content readContent(InputStream in) throws IOException {
+            InputStreamReader reader = new InputStreamReader(in, "UTF-8");
+            StringBuilder sb = new StringBuilder();
+            int ch;
+            while ((ch = reader.read()) != -1) {
+                sb.append((char) ch);
+            }
+            String line = sb.toString().trim();
+            if (line.isEmpty()) {
+                return null;
             }
 
-            // Разбиваем строку по пробелам
-            String[] tokens = line.trim().split("\\s+");
-
+            String[] tokens = line.split("\\s+");
             if (tokens.length < 3) {
-                throw new IOException("Invalid line format: " + line);
+                throw new IOException("Ошибка формата: " + line);
             }
 
-            // Первый токен - название (может содержать подчеркивания)
             String title = tokens[0].replace("_", " ");
-
-            // Второй токен - рейтинг
             int rating;
             try {
                 rating = Integer.parseInt(tokens[1]);
             } catch (NumberFormatException e) {
-                throw new IOException("Invalid rating format: " + tokens[1]);
+                throw new IOException("Ошибка формата: " + tokens[1]);
             }
 
-            // Третий токен - длина массива
             int length;
             try {
                 length = Integer.parseInt(tokens[2]);
             } catch (NumberFormatException e) {
-                throw new IOException("Invalid length format: " + tokens[2]);
+                throw new IOException("Ошибка формата: " + tokens[2]);
             }
 
-            // Проверяем, что достаточно элементов для массива
             if (tokens.length < 3 + length) {
-                throw new IOException("Not enough array elements. Expected: " + length +
-                        ", found: " + (tokens.length - 3));
+                throw new IOException("Не хватка элементов. " + length +
+                        ", найти: " + (tokens.length - 3));
             }
 
-            // Читаем элементы массива
             int[] arr = new int[length];
             for (int i = 0; i < length; i++) {
                 try {
                     arr[i] = Integer.parseInt(tokens[3 + i]);
                 } catch (NumberFormatException e) {
-                    throw new IOException("Invalid array element format: " + tokens[3 + i]);
+                    throw new IOException("Ошибка формата: " + tokens[3 + i]);
                 }
             }
-
             return new BooksSeries(title, arr, rating);
     }
 
 
     //вывод сериализованных объектов
     public static void serializeContent (Content o, OutputStream out) throws IOException{
-        try(ObjectOutputStream doc = new ObjectOutputStream(out)) {
-            doc.writeObject(o);
-            doc.flush();
-        }
+        ObjectOutputStream doc = new ObjectOutputStream(out);
+        doc.writeObject(o);
+        doc.flush();
     }
 
 
     //ввод десериализованного объекта
     public static Content deserializeContent(InputStream in) throws ClassNotFoundException, IOException{
-        try(ObjectInputStream doc = new ObjectInputStream(in)) {
-            return (Content) doc.readObject();
-        }
+        ObjectInputStream doc = new ObjectInputStream(in);
+        return (Content) doc.readObject();
     }
 
 
@@ -137,9 +133,7 @@ public class Helper {
     public static void writeFormatContent (Content o, Writer out) throws IOException{
         PrintWriter pw = new PrintWriter(out);
         pw.printf("%s;%d", o.getTitle(), o.getRating());
-        for (int p : o.getArray()) {
-            pw.printf(";%d", p);
-        }
+        for (int p : o.getArray()) {pw.printf(";%d", p);}
         pw.println();
         pw.flush();
     };
@@ -152,11 +146,9 @@ public class Helper {
         if (parts.length < 3) {
             throw new IOException("Недостаточно данных в строке: " + line);
         }
-
         String title = parts[0];
         int rating = Integer.parseInt(parts[1]);
         int count = Integer.parseInt(parts[2]);
-
         int[] arr = new int[count];
         for (int i = 0; i < count && (3 + i) < parts.length; i++) {
             arr[i] = Integer.parseInt(parts[3 + i]);
