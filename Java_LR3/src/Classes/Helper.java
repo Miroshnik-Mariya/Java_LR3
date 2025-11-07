@@ -8,6 +8,11 @@ import java.util.Scanner;
 import Interfaces.Content;
 
 public class Helper {
+    public static Content synchronizedContent(Content i){
+        return new WrapperContent(i);
+    }
+
+
     //запись в байтовый поток
     public static void outputContent (Content o, OutputStream out) throws IOException{
         o.output(out);
@@ -32,36 +37,6 @@ public class Helper {
     public static void writeContent (Content o, Writer out) throws IOException{
         o.write(out);
     }
-
-
-    //чтение из символьного потока
-    //  public static Content readContent(Reader in) throws IOException {
-//        StreamTokenizer doc = new StreamTokenizer(in);
-//        doc.parseNumbers();
-//
-//        if (doc.nextToken() != StreamTokenizer.TT_WORD) {
-//            throw new IOException("Expected title");
-//        }
-//        String title = doc.sval.replace("_", " "); // восстанавливаем пробелы
-//
-//        if (doc.nextToken() != StreamTokenizer.TT_NUMBER) {
-//            throw new IOException("Expected rating");
-//        }
-//        int rating = (int) doc.nval;
-//
-//        if (doc.nextToken() != StreamTokenizer.TT_NUMBER) {
-//            throw new IOException("Expected length");
-//        }
-//        int length = (int) doc.nval;
-//
-//        int[] arr = new int[length];
-//        for (int i = 0; i < length; i++) {
-//            if (doc.nextToken() != StreamTokenizer.TT_NUMBER) {
-//                throw new IOException("Array element expected at index " + i);
-//            }
-//            arr[i] = (int) doc.nval;
-//        }
-//        return new BooksSeries(title, arr, rating);
 
     //чтение из символьного потока
 

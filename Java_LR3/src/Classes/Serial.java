@@ -212,4 +212,10 @@ public class Serial implements Content, Serializable {
         pw.println();
         pw.flush();
     }
+
+
+    @Override
+    public int length(){
+        return episodesSeason.length;
+    }
 }

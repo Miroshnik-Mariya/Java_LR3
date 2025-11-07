@@ -27,4 +27,6 @@ public interface Content extends Serializable {
     void write(Writer out) throws IOException;
 
     double calculateAverage() throws SeriesOperationException;
+
+    int length();
 }

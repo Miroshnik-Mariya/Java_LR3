@@ -2,6 +2,8 @@ import Classes.*;
 import Classes.Serial;
 import Interfaces.*;
 import Exception.*;
+import Threads.ThreadRead;
+import Threads.ThreadWrite;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -24,6 +26,9 @@ public class Main {
             System.out.println("4. Сериализация/десериализация (Задание 2)");
             System.out.println("5. Форматный текстовый ввод/вывод (Задание 3)");
             System.out.println("6. Показать все публикации");
+            System.out.println("7. Лабораторная работа №5. Классы ThreadWrite и ThreadRead");
+            System.out.println("8. Лабораторная работа №5. Runnable");
+            System.out.println("9. Лабораторная работа №5. Класс WrapperContent");
             System.out.println("0. Выход");
             System.out.print("Выберите действие: ");
 
@@ -54,6 +59,18 @@ public class Main {
                     case 6:
                         showAllContent();
                         break;
+                    case 7:
+                        threadClasses();
+                        break;
+
+                    case 8:
+                        runnableClasses();
+                        break;
+
+                    case 9:
+                        wrapperClasses();
+                        break;
+
                     default:
                         System.out.println("Команда не распознана. Повторите ввод: ");
                 }
@@ -63,6 +80,87 @@ public class Main {
             }
         }
         scanner.close();
+    }
+
+    private static void threadClasses(){
+        int[] array = new int[100];
+        Content content = new BooksSeries("Нити", array, 5);
+        ThreadWrite writer = new ThreadWrite(content);
+        ThreadRead reader = new ThreadRead(content);
+
+        writer.start();
+        reader.start();
+
+        try {
+            writer.join();
+            reader.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("\nОбе нити завершили работу");
+    }
+
+
+    private static void runnableClasses(){
+        int[] array = new int[100];
+        Content content = new Serial("Runnable", array, 5);
+        Semaphore writer = new Semaphore(1);
+        Semaphore reader = new Semaphore(0);
+
+        ThreadWriteRun writeRun = new ThreadWriteRun(content, writer, reader);
+        ThreadReadRun readRun = new ThreadReadRun(content, reader, writer);
+
+        Thread writeTh = new Thread(writeRun);
+        Thread readTh = new Thread(readRun);
+
+        writeTh.start();
+        readTh.start();
+
+        try {
+            writeTh.join();
+            readTh.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("\nОбе нити завершили работу");
+    }
+
+    private static void wrapperClasses() throws InterruptedException {
+        Content originalContent = new BooksSeries("Test", new int[]{1, 2, 3}, 5);
+        Content syncContent = new WrapperContent(originalContent);
+
+        Thread t1 = new Thread(() -> testContent(syncContent, "Thread-1"));
+        Thread t2 = new Thread(() -> testContent(syncContent, "Thread-2"));
+
+        t1.start();
+        t2.start();
+
+        try {
+            t1.join();
+            t2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Тест завершен");
+
+    }
+
+
+    private static void testContent(Content content, String threadName) {
+        for (int i = 0; i < 5; i++) {
+            try {
+                System.out.println(threadName + " getTitle: " + content.getTitle());
+                content.setTitle("Title " + i);
+                System.out.println(threadName + " getRating: " + content.getRating());
+                content.setRating(i);
+                int[] arr = content.getArray();
+                content.setArray(new int[]{i, i + 1, i + 2});
+                System.out.println(threadName + " getElement("+i+"): " + content.getElement(0));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private static void showAllContent() {

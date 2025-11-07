@@ -23,8 +23,6 @@ public class BooksSeries implements Content, Serializable {
 //        setArray(pagesSeries);
 //        setRating(rating);
 //    }
-
-
     public BooksSeries(String title, int[] pagesSeries, int rating) {
         if (title == null || title.trim().isEmpty()) {
             throw new InvalidDataException("Введено пустое название.");
@@ -148,7 +146,6 @@ public class BooksSeries implements Content, Serializable {
     }
 
 
-
     @Override
     public String toString() {
         try {
@@ -202,9 +199,6 @@ public class BooksSeries implements Content, Serializable {
         result = 31 * result + rating;
         return result;
     }
-
-
-
 //    public void output(OutputStream out) {
 //        try {
 //            String data = "Title: " + getTitle() + "\n" +
@@ -227,7 +221,6 @@ public class BooksSeries implements Content, Serializable {
         text.flush();
     }
 
-
     //записи в символьный поток
     @Override
     public void write(Writer out) throws IOException{
@@ -245,5 +238,10 @@ public class BooksSeries implements Content, Serializable {
         for (int v : pagesSeries) pw.print(" " + v);
         pw.println();
         pw.flush();
+    }
+
+    @Override
+    public int length(){
+        return pagesSeries.length;
     }
 }
