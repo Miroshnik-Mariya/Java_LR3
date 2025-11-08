@@ -14,14 +14,11 @@ public class ThreadWrite extends Thread {
     @Override
     public void run() {
         try {
-            //int[] array = content.getArray();
             System.out.println("Начало записи");
-
             for (int i = 0; i < content.length(); i++) {
                 int value = 1 + (int) (Math.random() * 1000);
                 content.setElement(i, value);
                 System.out.println(" Write: " + value + " to position " + i);
-                //Thread.sleep(10);
             }
             System.out.println("Запись окончена.");
         } catch (InvalidDataException e) {

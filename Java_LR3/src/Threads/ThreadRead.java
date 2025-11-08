@@ -14,13 +14,10 @@ public class ThreadRead extends Thread {
     @Override
     public void run() {
         try {
-            //int[] array = content.getArray();
             System.out.println("Начало чтения");
-
             for (int i = 0; i < content.length(); i++) {
                 int value = content.getElement(i);
                 System.out.println(" Read: " + value + " from position " + i);
-                //Thread.sleep(10); // Небольшая задержка для наглядности
             }
 
             System.out.println("Чтение завершено. Прочитано элементов: " + content.length());

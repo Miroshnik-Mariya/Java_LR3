@@ -69,29 +69,7 @@ public class WrapperContent implements Content {
     public synchronized double calculateAverage() throws SeriesOperationException {
         return wrappedContent.calculateAverage();
     }
-//
-//    public synchronized void setTitleAndRating(String title, int rating) {
-//        wrappedContent.setTitle(title);
-//        wrappedContent.setRating(rating);
-//    }
-//
-//    public synchronized String getTitleAndRating() {
-//        return wrappedContent.getTitle() + " (" + wrappedContent.getRating() + "/5)";
-//    }
-
-//    @Override
-//    public synchronized String toString() {
-//        return "SynchronizedWrapper{" + wrappedContent.toString() + "}";
-//    }
-//
-//    @Override
-//    public synchronized boolean equals(Object obj) {
-//        if (this == obj) return true;
-//        if (obj == null || getClass() != obj.getClass()) return false;
-//        WrapperContent that = (WrapperContent) obj;
-//        return wrappedContent.equals(that.wrappedContent);
-//    }
-
+    
     @Override
     public synchronized int hashCode() {
         return wrappedContent.hashCode();
