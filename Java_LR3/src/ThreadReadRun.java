@@ -15,7 +15,6 @@ public class ThreadReadRun implements Runnable{
     public void run() {
         try{
             int value = 0;
-            //int[] arr = content.getArray();
             for(int i = 0; i<content.length(); i++){
                 reader.getPermission();
                 value = content.getElement(i);

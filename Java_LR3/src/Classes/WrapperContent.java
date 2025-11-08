@@ -9,7 +9,6 @@ import java.io.Writer;
 public class WrapperContent implements Content {
     private final Content wrappedContent;
 
-    // 🔒 Все методы синхронизируются на ОДНОМ объекте - this
     public WrapperContent(Content content) {
         this.wrappedContent = content;
     }
@@ -36,14 +35,12 @@ public class WrapperContent implements Content {
 
     @Override
     public synchronized int[] getArray() {
-        // ✅ ВАЖНО: возвращаем КОПИЮ массива!
         int[] original = wrappedContent.getArray();
         return original != null ? original.clone() : new int[0];
     }
 
     @Override
     public synchronized void setArray(int[] array) {
-        // ✅ ВАЖНО: сохраняем КОПИЮ массива!
         int[] copy = array != null ? array.clone() : new int[0];
         wrappedContent.setArray(copy);
     }
@@ -72,29 +69,28 @@ public class WrapperContent implements Content {
     public synchronized double calculateAverage() throws SeriesOperationException {
         return wrappedContent.calculateAverage();
     }
+//
+//    public synchronized void setTitleAndRating(String title, int rating) {
+//        wrappedContent.setTitle(title);
+//        wrappedContent.setRating(rating);
+//    }
+//
+//    public synchronized String getTitleAndRating() {
+//        return wrappedContent.getTitle() + " (" + wrappedContent.getRating() + "/5)";
+//    }
 
-    // ✅ Атомарные комбинированные операции
-    public synchronized void setTitleAndRating(String title, int rating) {
-        wrappedContent.setTitle(title);
-        wrappedContent.setRating(rating);
-    }
-
-    public synchronized String getTitleAndRating() {
-        return wrappedContent.getTitle() + " (" + wrappedContent.getRating() + "/5)";
-    }
-
-    @Override
-    public synchronized String toString() {
-        return "SynchronizedWrapper{" + wrappedContent.toString() + "}";
-    }
-
-    @Override
-    public synchronized boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        WrapperContent that = (WrapperContent) obj;
-        return wrappedContent.equals(that.wrappedContent);
-    }
+//    @Override
+//    public synchronized String toString() {
+//        return "SynchronizedWrapper{" + wrappedContent.toString() + "}";
+//    }
+//
+//    @Override
+//    public synchronized boolean equals(Object obj) {
+//        if (this == obj) return true;
+//        if (obj == null || getClass() != obj.getClass()) return false;
+//        WrapperContent that = (WrapperContent) obj;
+//        return wrappedContent.equals(that.wrappedContent);
+//    }
 
     @Override
     public synchronized int hashCode() {

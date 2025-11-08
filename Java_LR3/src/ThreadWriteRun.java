@@ -16,7 +16,6 @@ public class ThreadWriteRun implements Runnable{
     public void run() {
         int value = 0;
         try {
-            //int[] arr = content.getArray();
             for (int i = 0; i < content.length(); i++) {
                 writer.getPermission(); //получаем/ожидаем разрешение
                 value = 1+(int)(Math.random()*1000);

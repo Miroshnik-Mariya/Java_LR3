@@ -129,9 +129,9 @@ public class Main {
     private static void wrapperClasses() throws InterruptedException {
         Content originalContent = new BooksSeries("Test", new int[]{1, 2, 3}, 5);
         Content syncContent = new WrapperContent(originalContent);
-
-        Thread t1 = new Thread(() -> testContent(syncContent, "Thread-1"));
-        Thread t2 = new Thread(() -> testContent(syncContent, "Thread-2"));
+        System.out.println(" ");
+        Thread t1 = new Thread(() -> testContent(syncContent, "T1"));
+        Thread t2 = new Thread(() -> testContent(syncContent, "T2"));
 
         t1.start();
         t2.start();
@@ -173,7 +173,7 @@ public class Main {
         }
 
         for (int i = 0; i < contentDatabase.size(); i++) {
-            System.out.println("Запись #" + (i + 1));
+            System.out.println("Запись " + (i + 1));
             System.out.println(contentDatabase.get(i));
         }
     }
