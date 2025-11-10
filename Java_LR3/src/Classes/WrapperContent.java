@@ -69,7 +69,7 @@ public class WrapperContent implements Content {
     public synchronized double calculateAverage() throws SeriesOperationException {
         return wrappedContent.calculateAverage();
     }
-    
+
     @Override
     public synchronized int hashCode() {
         return wrappedContent.hashCode();
